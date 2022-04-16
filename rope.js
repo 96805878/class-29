@@ -1,0 +1,78 @@
+class Rope{
+
+    constructor(nlink, pointA){
+        this.nlink=nlink
+        this.pointA=pointA
+        const group=Body.nextGroup(true)
+        const rects=Composites.stack(100,100,this.nlink,1,5,5,function(x,y){
+            Bodies.rectangle(x,y,30,5,{collisionFilter:{group:group}})
+        })
+        
+        this.body=Composites.chain(rects,0.1,0,-0.6,0,{stiffness:0.1,length:0.1,render:{type:"line"}})
+        World.add(world,this.body)
+
+        Composite.add(rects,Constraint.create({
+            pointA:this.pointA,
+            bodyB:rects.bodies[0],
+            pointB:{x:-10,y:0},
+            length:10,
+            stiffness:0.1
+            
+        }))
+    }
+    display(){
+        if(this.body!=null){
+            for(var i=0;i<this.body.bodies.length-1;i++){
+                this.drawVertices(this.body.bodies[i].vertices)
+            }
+        }
+    }
+    drawVertices(vertices){
+        beginShape()
+        fill("yellow")
+        noStroke();
+        for(var i=0;i<vertices.length;i++){
+            vertex(vertices[i].x,vertices[i].y)
+        }
+        endShape(CLOSE);
+    }
+    dispayConstraints(constraints){
+
+        if(constraints!=null){
+            for(var i;i<constraints.length;i++){
+                this.drawConstraints(constraints[i])
+            }
+        }
+    }
+
+
+    drawConstraint(constraint){
+        if(constraint!=null){
+            
+            const offsetA = constraint.pointA;
+            var posA = {x: 0, y: 0}
+            if(constraint.bodyA){
+                posA = constraint.bodyA.position
+            }
+
+            const offsetB = constraint.pointB
+            var posB={x: 0, y: 0}
+            if(constraint.bodyB){
+                posB = constraint.bodyB.position
+            }
+            
+
+            push()
+            strokeWeight(4);
+            stroke(255);
+            line( posA.x + offsetA.x, posA.y + offsetA.y, posB.x+ offsetB.x, posB.y+offsetB.y )
+            pop()
+        }
+    }
+    break(){
+        this.body=null
+
+    }
+
+    
+}
